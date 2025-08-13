@@ -48,7 +48,7 @@ env:
 jobs:
 
   init_os_arch:
-    runs-on: windows-latest
+    runs-on: fidwin
     outputs:
       library_extension:  ${{ steps.set_library_extension.outputs.library_extension }}
       arch_code:  ${{ steps.set_arch.outputs.arch_code }}
@@ -95,7 +95,7 @@ jobs:
           "arch_code=$arch" | Out-File -Append -FilePath $env:GITHUB_OUTPUT
 
   scrape_fe_version:
-    runs-on: windows-latest
+    runs-on: fidwin
     
     outputs:
       scraped_version: ${{ steps.set_scraped_version.outputs.scraped_version }}
@@ -128,7 +128,7 @@ jobs:
           echo "scraped_version=$fileContent" | Out-File -Append -FilePath $env:GITHUB_OUTPUT
    
   download-Yui-patch:
-    runs-on: windows-latest
+    runs-on: fidwin
     needs: 
       - scrape_fe_version
       - init_os_arch
@@ -224,7 +224,7 @@ jobs:
           if-no-files-found: error
 
   download-msojocs-server:
-    runs-on: windows-latest
+    runs-on: fidwin
 
     steps:
       - name: Set up Git
@@ -255,7 +255,7 @@ jobs:
 
   download-fiddler-everywhere-windows:
     if: ${{ github.event.inputs.os-and-arch == 'Windows (x86_64)' }}
-    runs-on: windows-latest
+    runs-on: fidwin
     needs: 
       - scrape_fe_version
 
@@ -390,7 +390,7 @@ jobs:
           if-no-files-found: error
 
   patch_fe:
-    runs-on: windows-latest
+    runs-on: fidwin
 
     needs:
       - download-Yui-patch
