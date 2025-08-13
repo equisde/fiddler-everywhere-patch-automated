@@ -11,9 +11,39 @@ on:
         options:
           - Windows (x86_64)
           - Linux (x86_64)
+      patch-server-port:
+        description: 'Patch server port (useful for resolving port conflicts)"'
+        required: true
+        default: '5678'
+      patch-user-email:
+        description: 'Fake registered email (for fake FE account)'
+        required: true
+        default: 'long@telerik.com'
+      patch-user-firstName:
+        description: 'Fake registered first name (for fake FE account)'
+        required: true
+        default: 'Long'
+      patch-user-lastName:
+        description: 'Fake registered last name (for fake FE account)'
+        required: true
+        default: 'Wang'
+      patch-user-country-code:
+        description: 'Fake registered country code (for fake FE account) ; Ex: 86'
+        required: true
+        default: '86'
+      patch-user-provider:
+        description: 'Fake registered provider (for fake FE account) ; Ex: Google'
+        required: true
+        default: 'Google'
 
 env:
   OS_ARCH: ${{ github.event.inputs.os-and-arch }}
+  PATCH_SERVER_PORT: ${{ github.event.inputs.patch-server-port }}
+  PATCH_USER_EMAIL: ${{ github.event.inputs.patch-user-email }}
+  PATCH_USER_FNAME: ${{ github.event.inputs.patch-user-firstName }}
+  PATCH_USER_LNAME: ${{ github.event.inputs.patch-user-lastName }}
+  PATCH_USER_COUNTRYCODE: ${{ github.event.inputs.patch-user-country-code }}
+  PATCH_USER_PROVIDER: ${{ github.event.inputs.patch-user-provider }}
 
 jobs:
 
@@ -438,6 +468,32 @@ jobs:
             Write-Host "Source Server Folder not found"
           }
         shell: pwsh
+
+      - name: Set patch server port (in main.js of server)
+        run: |
+          $source_index = "msojocs-patch/server/index.js"
+          $index_content = Get-Content -Path $source_index -Raw
+
+          if (Test-Path $source_index) {
+            $index_content = $index_content -replace 'const port = \d+;', "const port = $env:PATCH_SERVER_PORT;"
+            Set-Content -Path $source_index -Value $index_content
+            Write-Host "Server port set to $env:PATCH_SERVER_PORT"
+          } else {
+            Write-Host "index.js (from server) not found"
+          }
+
+      - name: Set user credentials
+        run: |
+          $source_json = "FE/resources/app/out/file/identity.getfiddler.com/oauth/token.json"
+          $main_content = Get-Content -Path $source_json -Raw | ConvertFrom-Json
+
+          $main_content.user_info.email = $env:PATCH_USER_EMAIL
+          $main_content.user_info.firstName = $env:PATCH_USER_FNAME
+          $main_content.user_info.lastName = $env:PATCH_USER_LNAME
+          $main_content.user_info.country = $env:PATCH_USER_COUNTRYCODE
+          $main_content.user_info.identities[0].providerName = $env:PATCH_USER_PROVIDER
+
+          $main_content | ConvertTo-Json -Depth 5 | Set-Content -Path $source_json
 
       - name: Patch main.js to main.original.js
         run: |

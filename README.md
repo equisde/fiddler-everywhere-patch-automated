@@ -10,6 +10,16 @@ This's the guide for applying patch automatically.
 
 ![Unlimited Trial](https://github.com/user-attachments/assets/e9c83778-27fa-456a-96e6-07bb0cd7f4ad)
 
+---
+
+## Feature Updates
+> [!TIP]
+> Now supports changing patch server port (Useful if port conflitcts encountered)
+
+> [!TIP]
+> Now supports changing default user profile (fake) for FE (incl - email, fname, lname, country-code, provider)
+
+---
 
 > [!IMPORTANT]
 > Linux Automated Patching is Supported Now!
